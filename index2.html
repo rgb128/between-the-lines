@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Chessboard</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #eee;
+    }
+
+    #container {
+      width: 100vw;
+      height: 100vh;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      transition: background-size 0.3s ease, background-position 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+  <div id="container"></div>
+  <canvas id="chessboard" width="200" height="200" style="display: none;"></canvas>
+
+  <script>
+    const canvas = document.getElementById('chessboard');
+    const ctx = canvas.getContext('2d');
+    const container = document.getElementById('container');
+    const size = 200;
+    const squares = 8;
+    const squareSize = size / squares;
+
+    // Draw the chessboard
+    for (let row = 0; row < squares; row++) {
+      for (let col = 0; col < squares; col++) {
+        ctx.fillStyle = (row + col) % 2 === 0 ? '#fff' : '#000';
+        ctx.fillRect(col * squareSize, row * squareSize, squareSize, squareSize);
+      }
+    }
+
+    // Set the canvas as background image for container
+    const dataURL = canvas.toDataURL();
+    container.style.backgroundImage = `url(${dataURL})`;
+
+    // Logic to zoom and pan background
+    let scale = 1;
+    let offsetX = 50;
+    let offsetY = 50;
+
+    container.addEventListener('click', (event) => {
+      const rect = container.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
+
+      scale *= 1.2;
+
+      offsetX = x - (x - offsetX) * 1.2;
+      offsetY = y - (y - offsetY) * 1.2;
+
+      container.style.backgroundSize = `${scale * 100}%`;
+      container.style.backgroundPosition = `${offsetX}px ${offsetY}px`;
+    });
+  </script>
+</body>
+</html>
