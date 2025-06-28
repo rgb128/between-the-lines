@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
 
     <style>
@@ -15,7 +15,9 @@
             transform-origin: 0 0;
 
             background-image: url('https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/CHESScom/phphK5JVu.png');
-            background-size: contain;
+            background-size: 100%;
+            background-position: 0 0;
+            background-repeat: no-repeat;
         }
     </style>
 </head>
@@ -32,6 +34,11 @@
         const CONTAINER_WIDTH = 100;
         const CONTAINER_HEIGHT = 100;
 
+        let imageZoom = 1;
+        let imagePositionX = 0;
+        let imagePositionY = 0;
+        const ZOOM_MULTIPLIER = 1.2;
+
         window.onresize = _ => {
             const zoomX = window.innerWidth / CONTAINER_WIDTH;
             const zoomY = window.innerHeight / CONTAINER_HEIGHT;
@@ -44,13 +51,31 @@
             container.style.left = round(x, 2) + 'px';
             container.style.top = round(y, 2) + 'px';
             container.style.transform = `scale(${zoom})`;
+            container.style.bac
         }
 
         window.onresize();
 
         container.onclick = e => {
-            console.log(e.offsetX, e.offsetY);
-        }
+            const clickX = e.offsetX;
+            const clickY = e.offsetY;
+
+            // Convert click position to image coordinates (before zoom)
+            const clickImageX = (clickX - imagePositionX) / imageZoom;
+            const clickImageY = (clickY - imagePositionY) / imageZoom;
+
+            // Apply zoom
+            imageZoom *= ZOOM_MULTIPLIER;
+
+            // New position should keep the image point under cursor stationary
+            imagePositionX = clickX - clickImageX * imageZoom;
+            imagePositionY = clickY - clickImageY * imageZoom;
+
+            container.style.backgroundSize = round(100 * imageZoom, 3) + '%';
+            container.style.backgroundPositionX = round(imagePositionX, 3) + 'px';
+            container.style.backgroundPositionY = round(imagePositionY, 3) + 'px';
+        };
+
     </script>
 </body>
 </html>
