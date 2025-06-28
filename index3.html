@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+
+    <style>
+        #container {
+            width: 100px;
+            height: 100px;
+            background-color: #808080;
+
+            position: fixed;
+            transform-origin: 0 0;
+
+            background-image: url('https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/CHESScom/phphK5JVu.png');
+            background-size: contain;
+        }
+    </style>
+</head>
+<body>
+    <div id="container"></div>
+
+    <script>
+        function round(base, dec) {
+            const multiplier = Math.pow(10, dec);
+            return Math.round(base * multiplier) / multiplier;
+        }
+
+        const container = document.getElementById('container');
+        const CONTAINER_WIDTH = 100;
+        const CONTAINER_HEIGHT = 100;
+
+        window.onresize = _ => {
+            const zoomX = window.innerWidth / CONTAINER_WIDTH;
+            const zoomY = window.innerHeight / CONTAINER_HEIGHT;
+
+            const zoom = Math.max(zoomX, zoomY);
+
+            const x = (window.innerWidth - CONTAINER_WIDTH * zoom) / 2;
+            const y = (window.innerHeight - CONTAINER_HEIGHT * zoom) / 2;
+
+            container.style.left = round(x, 2) + 'px';
+            container.style.top = round(y, 2) + 'px';
+            container.style.transform = `scale(${zoom})`;
+        }
+
+        window.onresize();
+
+        container.onclick = e => {
+            console.log(e.offsetX, e.offsetY);
+        }
+    </script>
+</body>
+</html>
