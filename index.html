@@ -19,7 +19,9 @@
             width: 100%;
             height: 100%;
             transform: translate(0, 0) scale(1);
-            transition: transform 3s ease-in;
+            /* transition: transform 3s ease-in; */
+            transition: transform 3s cubic-bezier(1, 0, .9, 0);
+            /* transition: transform 3s cubic-bezier(1, 0, .7, 0); */
             /* transition: transform 10s cubic-bezier(0.94, 0.06, 0.47, 0.95); */
             /* http://www.css3beziercurve.net/ */
             /* https://easings.co/ */
@@ -40,15 +42,15 @@
 
         const images = [];
         async function fillImages() {
-            for (let i = 0; i < 10; i++) {
+            for (let i = 0; i < 3; i++) {
                 const img = await loadImage(generateImageUrl());
                 images.push(img);
             }
-            console.log('images loaded');
         }
 
         const container = document.getElementById('container');
         const SIZE = 300;
+        // const SIZE = 500;
         const WIDTH = SIZE;
         const HEIGHT = SIZE;
         const IMAGE_URL = generateImageUrl();
@@ -58,8 +60,10 @@
         container.style.height = HEIGHT + 'px';
 
         function round(base, dec) {
-            const multiplier = Math.pow(10, dec);
-            return Math.round(base * multiplier) / multiplier;
+            return base.toFixed();
+            // return base.toFixed(dec);
+            // const multiplier = Math.pow(10, dec);
+            // return Math.round(base * multiplier) / multiplier;
         }
 
         window.onresize = _ => {
@@ -74,13 +78,12 @@
             container.style.left = round(x, 2) + 'px';
             container.style.top = round(y, 2) + 'px';
             container.style.transform = `scale(${zoom})`;
-            container.style.bac
         }
 
         window.onresize();
 
         container.onclick = e => {
-            if (!animationAvailable) return;
+            if (!animationAvailable || !images.length) return;
             animationAvailable = false;
             const clickX = e.offsetX;
             const clickY = e.offsetY;
@@ -92,13 +95,10 @@
             const imagePositionX = clickX - clickX * imageZoom;
             const imagePositionY = clickY - clickY * imageZoom;
 
-            container.style.backgroundSize = round(100 * imageZoom, 3) + '%';
-            container.style.backgroundPositionX = round(imagePositionX, 3) + 'px';
-            container.style.backgroundPositionY = round(imagePositionY, 3) + 'px';
-
-            const transformZoom = round(100 * imageZoom, 3) + '%';
-            const translateX = round(imagePositionX, 3) + 'px';
-            const translateY = round(imagePositionY, 3) + 'px';
+            const transformZoom = round(100 * imageZoom, 2) + '%';
+            const translateX = round(imagePositionX, 2) + 'px';
+            const translateY = round(imagePositionY, 2) + 'px';
+            console.log(transformZoom, translateX, translateY);
 
             const oldCanvas = container.querySelector('canvas.old');
             const pixelColor = getPixelColor(oldCanvas, clickX, clickY);
@@ -110,41 +110,21 @@
             newCanvas.classList.add('new');
             const newCtx = newCanvas.getContext('2d');
 
-            console.log('img load start');
-            const img = images.pop();
+            const img = images.shift();
+            loadImage(generateImageUrl()).then(img => images.push(img));
             newCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
 
-            // // Fill red background
-            // newCtx.fillStyle = pixelColor; // 'grey';
-            // newCtx.fillRect(0, 0, WIDTH, HEIGHT);
-
-            // // Draw 1 pixel square of the selected color
-            // newCtx.fillStyle = pixelColor;
-            // newCtx.fillRect(100, 100, WIDTH, HEIGHT);
-
             // Place new canvas scaled to 1px size and positioned at clicked pixel
-            newCanvas.style.transform = `translate(${clickX}px, ${clickY}px) scale(${1 / imageZoom})`;
+            // newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(0)`;
+            newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(${round(1 / imageZoom, 2)})`;
 
             container.appendChild(newCanvas);
 
-            console.log('here');
-
             // Trigger zoom to full size
             requestAnimationFrame(() => {
-                console.log('here2');
                 newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
-                container.querySelector('canvas.old').style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
-
-                // // After animation, replace .old with .new
-                // newCanvas.addEventListener('transitionend', () => {
-                //     oldCanvas.remove();
-                //     newCanvas.classList.remove('new');
-                //     newCanvas.classList.add('old');
-                //     console.log('transitioned');
-                //     animationAvailable = true;
-                // }, { once: true });
+                oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
             });
-            console.log('here3');
 
             // After animation, replace .old with .new
             newCanvas.addEventListener('transitionend', () => {
@@ -177,7 +157,8 @@
         async function processImage() {
             await fillImages();
 
-            const img = images.pop();
+            const img = images.shift();
+            loadImage(generateImageUrl()).then(img => images.push(img));
 
             // create old canvas
             const originalCanvas = document.createElement('canvas');
