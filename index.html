@@ -33,11 +33,25 @@
     </div>
 
     <script>
+        // Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
+
+        // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
+        const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
+
+        const images = [];
+        async function fillImages() {
+            for (let i = 0; i < 10; i++) {
+                const img = await loadImage(generateImageUrl());
+                images.push(img);
+            }
+            console.log('images loaded');
+        }
+
         const container = document.getElementById('container');
         const SIZE = 300;
         const WIDTH = SIZE;
         const HEIGHT = SIZE;
-        const IMAGE_URL = 'https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/CHESScom/phphK5JVu.png';
+        const IMAGE_URL = generateImageUrl();
         let animationAvailable = false;
 
         container.style.width = WIDTH + 'px';
@@ -96,24 +110,41 @@
             newCanvas.classList.add('new');
             const newCtx = newCanvas.getContext('2d');
 
-            // Fill red background
-            newCtx.fillStyle = 'grey';
-            newCtx.fillRect(0, 0, WIDTH, HEIGHT);
+            console.log('img load start');
+            const img = images.pop();
+            newCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
 
-            // Draw 1 pixel square of the selected color
-            newCtx.fillStyle = pixelColor;
-            newCtx.fillRect(100, 100, 100, 100);
+            // // Fill red background
+            // newCtx.fillStyle = pixelColor; // 'grey';
+            // newCtx.fillRect(0, 0, WIDTH, HEIGHT);
+
+            // // Draw 1 pixel square of the selected color
+            // newCtx.fillStyle = pixelColor;
+            // newCtx.fillRect(100, 100, WIDTH, HEIGHT);
 
             // Place new canvas scaled to 1px size and positioned at clicked pixel
             newCanvas.style.transform = `translate(${clickX}px, ${clickY}px) scale(${1 / imageZoom})`;
 
             container.appendChild(newCanvas);
 
+            console.log('here');
+
             // Trigger zoom to full size
             requestAnimationFrame(() => {
+                console.log('here2');
                 newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
                 container.querySelector('canvas.old').style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
+
+                // // After animation, replace .old with .new
+                // newCanvas.addEventListener('transitionend', () => {
+                //     oldCanvas.remove();
+                //     newCanvas.classList.remove('new');
+                //     newCanvas.classList.add('old');
+                //     console.log('transitioned');
+                //     animationAvailable = true;
+                // }, { once: true });
             });
+            console.log('here3');
 
             // After animation, replace .old with .new
             newCanvas.addEventListener('transitionend', () => {
@@ -144,7 +175,9 @@
         }
 
         async function processImage() {
-            const img = await loadImage(IMAGE_URL);
+            await fillImages();
+
+            const img = images.pop();
 
             // create old canvas
             const originalCanvas = document.createElement('canvas');
