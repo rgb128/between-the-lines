@@ -3,23 +3,13 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Infinite zoom</title>
 
     <style>
         #container {
-            /* width: 500px;
-            height: 500px; */
             background-color: #808080;
-
             position: fixed;
             transform-origin: 0 0;
-
-            /* background-image: url('https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/CHESScom/phphK5JVu.png');
-            background-size: 100%;
-            background-position: 0 0;
-            background-repeat: no-repeat;
-
-            transition: background-position 1s linear, background-size 1s linear; */
         }
 
         canvas {
@@ -35,15 +25,6 @@
             /* https://easings.co/ */
             transform-origin: 0 0;
         }
-
-        /* canvas.old {
-            position: absolute;
-            top: 0px;
-            left: 0px;
-            width: 100%;
-            height: 100%;
-            transform: translate(0, 0) scale(1);
-        } */
     </style>
 </head>
 <body>
@@ -58,15 +39,8 @@
         const HEIGHT = SIZE;
         const IMAGE_URL = 'https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/CHESScom/phphK5JVu.png';
 
-        // let imageZoom = 1;
-        // let imagePositionX = 0;
-        // let imagePositionY = 0;
-        // const ZOOM_MULTIPLIER = 2;
-
         container.style.width = WIDTH + 'px';
         container.style.height = HEIGHT + 'px';
-
-        const TRANSITION = `transform 10s ${generateExponentialBezier(2, 100)}`;
 
         function round(base, dec) {
             const multiplier = Math.pow(10, dec);
@@ -90,26 +64,6 @@
 
         window.onresize();
 
-        // container.onclick = e => {
-        //     const clickX = e.offsetX;
-        //     const clickY = e.offsetY;
-
-        //     // Convert click position to image coordinates (before zoom)
-        //     const clickImageX = (clickX - imagePositionX) / imageZoom;
-        //     const clickImageY = (clickY - imagePositionY) / imageZoom;
-
-        //     // Apply zoom
-        //     imageZoom *= ZOOM_MULTIPLIER;
-
-        //     // New position should keep the image point under cursor stationary
-        //     imagePositionX = clickX - clickImageX * imageZoom;
-        //     imagePositionY = clickY - clickImageY * imageZoom;
-
-        //     container.style.backgroundSize = round(100 * imageZoom, 3) + '%';
-        //     container.style.backgroundPositionX = round(imagePositionX, 3) + 'px';
-        //     container.style.backgroundPositionY = round(imagePositionY, 3) + 'px';
-        // };
-        
         container.onclick = e => {
             const clickX = e.offsetX;
             const clickY = e.offsetY;
@@ -129,28 +83,14 @@
             const translateX = round(imagePositionX, 3) + 'px';
             const translateY = round(imagePositionY, 3) + 'px';
 
-            // container.querySelector('canvas.old').style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
-
-            // create new canvas of the size WIDTH x HEIGHT with background = RED and and a square of color of the pixel i have chosen
-
-            // set her position and scale. it should be exactly on pixel i chose and of size=1px (do it only by transform)
-
-            // add it to container with class='new'
-
-            // set her new transform (100% zoom, 0 0 tansition)
-
             const oldCanvas = container.querySelector('canvas.old');
-            // const pixelX = Math.floor(clickX / (oldCanvas.getBoundingClientRect().width / WIDTH));
-            // const pixelY = Math.floor(clickY / (oldCanvas.getBoundingClientRect().height / HEIGHT));
             const pixelColor = getPixelColor(oldCanvas, clickX, clickY);
-
 
             // Create new canvas
             const newCanvas = document.createElement('canvas');
             newCanvas.width = WIDTH;
             newCanvas.height = HEIGHT;
             newCanvas.classList.add('new');
-            // newCanvas.style.transition = TRANSITION;
             const newCtx = newCanvas.getContext('2d');
 
             // Fill red background
@@ -159,18 +99,15 @@
 
             // Draw 1 pixel square of the selected color
             newCtx.fillStyle = pixelColor;
-            // newCtx.fillRect(pixelX, pixelY, 1, 1);
             newCtx.fillRect(100, 100, 100, 100);
 
             // Place new canvas scaled to 1px size and positioned at clicked pixel
-            // const zoomScale = imageZoom;
             newCanvas.style.transform = `translate(${clickX}px, ${clickY}px) scale(${1 / imageZoom})`;
 
             container.appendChild(newCanvas);
 
-            // // Trigger zoom to full size
+            // Trigger zoom to full size
             requestAnimationFrame(() => {
-                // newCanvas.style.transform = `translate(${translateX}px, ${translateY}px) scale(${transformZoom})`;
                 newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
                 container.querySelector('canvas.old').style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
             });
@@ -202,28 +139,6 @@
             });
         }
 
-        // function avgColor(r, g, b) {
-        //     return (r + g + b) / 3;
-        // }
-
-        // function drawTextOnPixel(ctx, color, x, y, scale) {
-        //     const avg = avgColor(color[0], color[1], color[2]);
-        //     const textColor = avg > 128 ? 'black' : 'white';
-
-        //     const fontSize = HEIGHT / 3 * scale;
-        //     const lineWidth = WIDTH / 6 * scale;
-
-        //     ctx.fillStyle = `rgb(${color[0]}, ${color[1]}, ${color[2]})`;
-        //     ctx.fillRect(x, y, WIDTH * scale, HEIGHT * scale);
-
-        //     ctx.fillStyle = textColor;
-        //     ctx.font = `${fontSize}px sans-serif`;
-        //     ctx.textAlign = "center";
-        //     ctx.textBaseline = "middle";
-        //     ctx.lineWidth = lineWidth;
-        //     ctx.fillText('a', x + WIDTH * scale / 2, y + HEIGHT * scale / 2);
-        // }
-
         async function processImage() {
             const img = await loadImage(IMAGE_URL);
 
@@ -232,70 +147,12 @@
             originalCanvas.classList.add('old');
             originalCanvas.width = WIDTH;
             originalCanvas.height = HEIGHT;
-            // originalCanvas.style.transition = TRANSITION;
             const oCtx = originalCanvas.getContext('2d');
             oCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
             container.appendChild(originalCanvas);
-
-
-            // // Original canvas
-            // const originalCanvas = document.createElement('canvas');
-            // originalCanvas.width = WIDTH;
-            // originalCanvas.height = HEIGHT;
-            // const oCtx = originalCanvas.getContext('2d');
-            // oCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
-
-            // const imageData = oCtx.getImageData(0, 0, WIDTH, HEIGHT).data;
-
-            // // Large canvas
-            // const finalCanvas = document.createElement('canvas');
-            // finalCanvas.width = WIDTH * WIDTH;
-            // finalCanvas.height = HEIGHT * HEIGHT;
-            // const fCtx = finalCanvas.getContext('2d');
-
-            // for (let y = 0; y < HEIGHT; y++) {
-            //     for (let x = 0; x < WIDTH; x++) {
-            //         const index = (y * WIDTH + x) * 4;
-            //         const r = imageData[index];
-            //         const g = imageData[index + 1];
-            //         const b = imageData[index + 2];
-            //         drawTextOnPixel(fCtx, [r, g, b], x * WIDTH, y * HEIGHT, 1);
-            //     }
-            // }
-
-            
-            // // Set as background image
-            // const dataURL = finalCanvas.toDataURL('image/png');
-            // document.getElementById('container').style.backgroundImage = `url(${dataURL})`;
-            
-            // console.log(dataURL);
-            // console.log('done');
         }
 
         processImage();
-
-
-
-        function generateExponentialBezier(base = 2, steps = 100) {
-            const target = [];
-            for (let i = 0; i <= steps; i++) {
-                const t = i / steps;
-                // Normalize exponential to [0,1]
-                const y = (Math.pow(base, t) - 1) / (base - 1);
-                target.push({ x: t, y });
-            }
-
-            // Approximate with bezier control points
-            // We'll use simple heuristics to get close enough
-            const p1x = 0.3;
-            const p1y = Math.pow(base, 0.3) / base;
-            const p2x = 0.7;
-            const p2y = Math.pow(base, 0.7) / base;
-
-            return `cubic-bezier(${p1x.toFixed(3)}, ${p1y.toFixed(3)}, ${p2x.toFixed(3)}, ${p2y.toFixed(3)})`;
-        }
-
-
 
     </script>
 </body>
