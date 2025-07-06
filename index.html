@@ -38,6 +38,7 @@
         const WIDTH = SIZE;
         const HEIGHT = SIZE;
         const IMAGE_URL = 'https://images.chesscomfiles.com/uploads/v1/images_users/tiny_mce/CHESScom/phphK5JVu.png';
+        let animationAvailable = false;
 
         container.style.width = WIDTH + 'px';
         container.style.height = HEIGHT + 'px';
@@ -65,6 +66,8 @@
         window.onresize();
 
         container.onclick = e => {
+            if (!animationAvailable) return;
+            animationAvailable = false;
             const clickX = e.offsetX;
             const clickY = e.offsetY;
 
@@ -118,6 +121,7 @@
                 newCanvas.classList.remove('new');
                 newCanvas.classList.add('old');
                 console.log('transitioned');
+                animationAvailable = true;
             }, { once: true });
 
         };
@@ -150,6 +154,7 @@
             const oCtx = originalCanvas.getContext('2d');
             oCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
             container.appendChild(originalCanvas);
+            animationAvailable = true;
         }
 
         processImage();
