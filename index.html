@@ -18,7 +18,7 @@
             left: 0px;
             width: 100%;
             height: 100%;
-            transform: translate(0, 0) scale(1);
+            transform: translate(0px, 0px) scale(1);
             /* transition: transform 3s ease-in; */
             transition: transform 3s cubic-bezier(1, 0, .9, 0);
             /* transition: transform 3s cubic-bezier(1, 0, .7, 0); */
@@ -38,6 +38,7 @@
         // Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
 
         // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
+        const SIZE = 1000;
         const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
 
         const images = [];
@@ -49,7 +50,6 @@
         }
 
         const container = document.getElementById('container');
-        const SIZE = 300;
         // const SIZE = 500;
         const WIDTH = SIZE;
         const HEIGHT = SIZE;
@@ -60,7 +60,8 @@
         container.style.height = HEIGHT + 'px';
 
         function round(base, dec) {
-            return base.toFixed();
+            return base.toFixed(3);
+            // return base.toFixed();
             // return base.toFixed(dec);
             // const multiplier = Math.pow(10, dec);
             // return Math.round(base * multiplier) / multiplier;
@@ -89,11 +90,13 @@
             const clickY = e.offsetY;
 
             // Apply zoom
-            const imageZoom = SIZE * SIZE;
+            const imageZoom = SIZE;
 
             // New position should keep the image point under cursor stationary
             const imagePositionX = clickX - clickX * imageZoom;
             const imagePositionY = clickY - clickY * imageZoom;
+            // const imagePositionX = clickX - clickX * SIZE;
+            // const imagePositionY = clickY - clickY * SIZE;
 
             const transformZoom = round(100 * imageZoom, 2) + '%';
             const translateX = round(imagePositionX, 2) + 'px';
@@ -115,7 +118,6 @@
             newCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
 
             // Place new canvas scaled to 1px size and positioned at clicked pixel
-            // newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(0)`;
             newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(${round(1 / imageZoom, 2)})`;
 
             container.appendChild(newCanvas);
