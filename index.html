@@ -95,8 +95,6 @@
             // New position should keep the image point under cursor stationary
             const imagePositionX = clickX - clickX * imageZoom;
             const imagePositionY = clickY - clickY * imageZoom;
-            // const imagePositionX = clickX - clickX * SIZE;
-            // const imagePositionY = clickY - clickY * SIZE;
 
             const transformZoom = round(100 * imageZoom, 2) + '%';
             const translateX = round(imagePositionX, 2) + 'px';
@@ -116,6 +114,7 @@
             const img = images.shift();
             loadImage(generateImageUrl()).then(img => images.push(img));
             newCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
+            fadeCanvasEdgesToColor(newCanvas, pixelColor);
 
             // Place new canvas scaled to 1px size and positioned at clicked pixel
             newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(${round(1 / imageZoom, 2)})`;
@@ -142,7 +141,8 @@
         function getPixelColor(canvas, x, y) {
             const ctx = canvas.getContext('2d');
             const data = ctx.getImageData(x, y, 1, 1).data;
-            return `rgb(${data[0]}, ${data[1]}, ${data[2]})`;
+            // return `rgb(${data[0]}, ${data[1]}, ${data[2]})`;
+            return data;
         }
 
 
@@ -171,6 +171,76 @@
             oCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
             container.appendChild(originalCanvas);
             animationAvailable = true;
+        }
+
+        function fadeCanvasEdgesToColor(canvas, color, fadeSize = SIZE / 4) {
+            // const ctx = canvas.getContext("2d");
+            // const { width, height } = canvas;
+            // const imageData = ctx.getImageData(0, 0, width, height);
+            // const data = imageData.data;
+
+            // // Parse the color input
+            // const [rFade, gFade, bFade] = color;
+
+            // for (let y = 0; y < height; y++) {
+            //     for (let x = 0; x < width; x++) {
+            //         const index = (y * width + x) * 4;
+
+            //         // Distance to closest edge
+            //         const dx = Math.min(x, width - x - 1);
+            //         const dy = Math.min(y, height - y - 1);
+            //         const dist = Math.min(dx, dy);
+
+            //         if (dist < fadeSize) {
+            //             const factor = dist / fadeSize; // 1 at center of fade, 0 at edge
+            //             const alpha = 1 - factor;
+
+            //             // Blend original pixel toward the target color
+            //             data[index + 0] = data[index + 0] * factor + rFade * alpha;
+            //             data[index + 1] = data[index + 1] * factor + gFade * alpha;
+            //             data[index + 2] = data[index + 2] * factor + bFade * alpha;
+            //             // Alpha stays unchanged
+            //         }
+            //     }
+            // }
+
+            // ctx.putImageData(imageData, 0, 0);
+            const ctx = canvas.getContext("2d");
+            const { width, height } = canvas;
+            const imageData = ctx.getImageData(0, 0, width, height);
+            const data = imageData.data;
+
+            const [rFade, gFade, bFade] = color;
+
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const index = (y * width + x) * 4;
+
+                    // Distance to nearest edge
+                    const dx = Math.min(x, width - x - 1);
+                    const dy = Math.min(y, height - y - 1);
+                    const dist = Math.min(dx, dy);
+
+                    if (dist < fadeSize) {
+                        // Normalize distance to 0 (edge) -> 1 (fadeSize)
+                        let factor = dist / fadeSize;
+
+                        // Use nonlinear curve (e.g., square) for stronger edge shading
+                        factor = Math.pow(factor, 2); // You can adjust power for different shading
+
+                        const alpha = 1 - factor;
+
+                        // Blend pixel color with fade color weighted by alpha
+                        data[index + 0] = data[index + 0] * factor + rFade * alpha;
+                        data[index + 1] = data[index + 1] * factor + gFade * alpha;
+                        data[index + 2] = data[index + 2] * factor + bFade * alpha;
+                        // keep original alpha channel
+                    }
+                }
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+
         }
 
         processImage();
