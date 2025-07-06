@@ -18,14 +18,14 @@
             left: 0px;
             width: 100%;
             height: 100%;
-            transform: translate(0, 0) scale(1);
+            transform: translate(0px, 0px) scale(1);
             /* transition: transform 3s ease-in; */
             transition: transform 3s cubic-bezier(1, 0, .9, 0);
-            /* transition: transform 3s cubic-bezier(1, 0, .7, 0); */
-            /* transition: transform 10s cubic-bezier(0.94, 0.06, 0.47, 0.95); */
             /* http://www.css3beziercurve.net/ */
             /* https://easings.co/ */
             transform-origin: 0 0;
+            
+            will-change: transform;
         }
     </style>
 </head>
@@ -37,6 +37,7 @@
     <script>
         // Canvas2D: Multiple readback operations using getImageData are faster with the willReadFrequently attribute set to true. See: https://html.spec.whatwg.org/multipage/canvas.html#concept-canvas-will-read-frequently
 
+        const SIZE = 300;
         // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
         const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
 
@@ -49,7 +50,6 @@
         }
 
         const container = document.getElementById('container');
-        const SIZE = 300;
         // const SIZE = 500;
         const WIDTH = SIZE;
         const HEIGHT = SIZE;
@@ -89,13 +89,14 @@
             const clickY = e.offsetY;
 
             // Apply zoom
+            // const imageZoom = 2;
             const imageZoom = SIZE * SIZE;
 
             // New position should keep the image point under cursor stationary
             const imagePositionX = clickX - clickX * imageZoom;
             const imagePositionY = clickY - clickY * imageZoom;
 
-            const transformZoom = round(100 * imageZoom, 2) + '%';
+            const transformZoom = round(imageZoom, 2);
             const translateX = round(imagePositionX, 2) + 'px';
             const translateY = round(imagePositionY, 2) + 'px';
             console.log(transformZoom, translateX, translateY);
@@ -117,21 +118,24 @@
             // Place new canvas scaled to 1px size and positioned at clicked pixel
             // newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(0)`;
             newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(${round(1 / imageZoom, 2)})`;
+            console.log(newCanvas.style.transform);
 
             container.appendChild(newCanvas);
 
             // Trigger zoom to full size
             requestAnimationFrame(() => {
-                newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
+                newCanvas.style.transform = `translateX(0px, 0px) scale(1)`;
                 oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
             });
 
+            console.log('sss');
+
             // After animation, replace .old with .new
             newCanvas.addEventListener('transitionend', () => {
+                console.log('transitioned');
                 oldCanvas.remove();
                 newCanvas.classList.remove('new');
                 newCanvas.classList.add('old');
-                console.log('transitioned');
                 animationAvailable = true;
             }, { once: true });
 
