@@ -3,7 +3,7 @@
 
 // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
 const SIZE = 1000;
-const IMAGES_QUEUE_SIZE = 5;
+const IMAGES_QUEUE_SIZE = 1;
 const FIRST_IMAGE_URL = '/first.png';
 const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
 
@@ -25,24 +25,27 @@ async function fillImages() {
 const container = document.getElementById('container');
 const WIDTH = SIZE;
 const HEIGHT = SIZE;
-const IMAGE_URL = generateImageUrl();
+// const IMAGE_URL = generateImageUrl();
 let animationAvailable = false;
 
 container.style.width = WIDTH + 'px';
 container.style.height = HEIGHT + 'px';
 
 window.onresize = _ => {
+    // void container.offsetWidth;
     const zoomX = window.innerWidth / WIDTH;
     const zoomY = window.innerHeight / HEIGHT;
-
+    
     const zoom = Math.max(zoomX, zoomY);
-
+    
     const x = (window.innerWidth - WIDTH * zoom) / 2;
     const y = (window.innerHeight - HEIGHT * zoom) / 2;
-
-    container.style.left = round(x) + 'px';
-    container.style.top = round(y) + 'px';
-    container.style.transform = `scale(${zoom})`;
+    
+    // container.style.left = round(x) + 'px';
+    // container.style.top = round(y) + 'px';
+    // container.style.transform = `scale(${zoom})`;
+    container.style.transform = `scale(${zoom}) translate(${x}px, ${y}px)`;
+    void container.offsetWidth;
 }
 
 window.onresize();
