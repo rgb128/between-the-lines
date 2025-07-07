@@ -32,8 +32,6 @@ container.style.width = WIDTH + 'px';
 container.style.height = HEIGHT + 'px';
 
 window.onresize = _ => {
-    void container.offsetWidth;
-
     const zoomX = window.innerWidth / WIDTH;
     const zoomY = window.innerHeight / HEIGHT;
 
@@ -45,11 +43,6 @@ window.onresize = _ => {
     container.style.left = round(x) + 'px';
     container.style.top = round(y) + 'px';
     container.style.transform = `scale(${zoom})`;
-    // container.style.transform = `scale(${zoom}) translate(${x}px, ${y}px)`;
-    // container.style.transform = `scale(${zoom})`;
-    // console.log('d', x, y, `scale(${zoom}) translate(${x}px, ${y}px)`);
-    // container.style.transform = `scale(${zoom})`;
-    void container.offsetWidth;
 }
 
 window.onresize();
