@@ -1,22 +1,11 @@
 :root {
     --transition-bezier: 3s cubic-bezier(1, 0, .7, 0);
-}
-
-* {
-    margin: 0px;
-    padding: 0px;
-}
-
-body {
-    position: relative;
-}
+}        
 
 #container {
     background-color: #808080;
     position: fixed;
     transform-origin: 0 0;
-    /* top: 0px;
-    left: 0px; */
 }
 
 canvas {
