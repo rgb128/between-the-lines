@@ -31,24 +31,24 @@ let animationAvailable = false;
 container.style.width = WIDTH + 'px';
 container.style.height = HEIGHT + 'px';
 
-// window.onresize = _ => {
-//     // void container.offsetWidth;
-//     const zoomX = window.innerWidth / WIDTH;
-//     const zoomY = window.innerHeight / HEIGHT;
+window.onresize = _ => {
+    // void container.offsetWidth;
+    const zoomX = window.innerWidth / WIDTH;
+    const zoomY = window.innerHeight / HEIGHT;
     
-//     const zoom = Math.max(zoomX, zoomY);
+    const zoom = Math.max(zoomX, zoomY);
     
-//     const x = (window.innerWidth - WIDTH * zoom) / 2;
-//     const y = (window.innerHeight - HEIGHT * zoom) / 2;
+    const x = (window.innerWidth - WIDTH * zoom) / 2;
+    const y = (window.innerHeight - HEIGHT * zoom) / 2;
     
-//     // container.style.left = round(x) + 'px';
-//     // container.style.top = round(y) + 'px';
-//     // container.style.transform = `scale(${zoom})`;
-//     // container.style.transform = `scale(${zoom}) translate(${x}px, ${y}px)`;
-//     void container.offsetWidth;
-// }
+    // container.style.left = round(x) + 'px';
+    // container.style.top = round(y) + 'px';
+    // container.style.transform = `scale(${zoom})`;
+    container.style.transform = `scale(${zoom}) translate(${x}px, ${y}px)`;
+    void container.offsetWidth;
+}
 
-// window.onresize();
+window.onresize();
 
 container.onclick = e => {
     if (!animationAvailable || !images.length) return;
