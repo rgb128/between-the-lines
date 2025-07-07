@@ -6,6 +6,10 @@
     <title>Infinite zoom</title>
 
     <style>
+        :root {
+            --transition-bezier: 3s cubic-bezier(1, 0, .7, 0);
+        }        
+
         #container {
             background-color: #808080;
             position: fixed;
@@ -20,11 +24,12 @@
             height: 100%;
             transform: translate(0px, 0px) scale(1);
             transform-origin: 0 0;
+            opacity: 1;
 
             /* -webkit-transition: transform 3s cubic-bezier(1, 0, .9, 0);
             -moz-transition: transform 3s cubic-bezier(1, 0, .9, 0);
             -o-transition: transform 3s cubic-bezier(1, 0, .9, 0); */
-            transition: transform 3s cubic-bezier(1, 0, .7, 0);
+            transition: transform var(--transition-bezier), opacity var(--transition-bezier);
             /* transition: transform 3s ease-out; */
         }
     </style>
@@ -100,6 +105,7 @@
             const newCanvas = document.createElement('canvas');
             newCanvas.width = WIDTH;
             newCanvas.height = HEIGHT;
+            newCanvas.style.opacity = 0;
             newCanvas.classList.add('new');
             const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
 
@@ -117,6 +123,7 @@
             requestAnimationFrame(() => {
                 newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
                 oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
+                newCanvas.style.opacity = 1;
             });
 
             // After animation, replace .old with .new
