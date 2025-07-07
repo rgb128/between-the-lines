@@ -31,10 +31,6 @@ let animationAvailable = false;
 container.style.width = WIDTH + 'px';
 container.style.height = HEIGHT + 'px';
 
-function round(base, dec) {
-    return base.toFixed(3);
-}
-
 window.onresize = _ => {
     const zoomX = window.innerWidth / WIDTH;
     const zoomY = window.innerHeight / HEIGHT;
@@ -44,8 +40,8 @@ window.onresize = _ => {
     const x = (window.innerWidth - WIDTH * zoom) / 2;
     const y = (window.innerHeight - HEIGHT * zoom) / 2;
 
-    container.style.left = round(x, 2) + 'px';
-    container.style.top = round(y, 2) + 'px';
+    container.style.left = round(x) + 'px';
+    container.style.top = round(y) + 'px';
     container.style.transform = `scale(${zoom})`;
 }
 
@@ -64,9 +60,9 @@ container.onclick = e => {
     const imagePositionX = clickX - clickX * imageZoom;
     const imagePositionY = clickY - clickY * imageZoom;
 
-    const transformZoom = round(100 * imageZoom, 2) + '%';
-    const translateX = round(imagePositionX, 2) + 'px';
-    const translateY = round(imagePositionY, 2) + 'px';
+    const transformZoom = round(100 * imageZoom) + '%';
+    const translateX = round(imagePositionX) + 'px';
+    const translateY = round(imagePositionY) + 'px';
 
     const oldCanvas = container.querySelector('canvas.old');
     const pixelColor = getPixelColor(oldCanvas, clickX, clickY);
@@ -85,31 +81,13 @@ container.onclick = e => {
     circularVignetteFade(newCanvas, pixelColor);
 
     // Place new canvas scaled to 1px size and positioned at clicked pixel
-    newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(${round(1 / imageZoom, 2)})`;
+    newCanvas.style.transform = `translate(${round(clickX)}px, ${round(clickY)}px) scale(${round(1 / imageZoom)})`;
     container.appendChild(newCanvas);
     void newCanvas.offsetWidth; // Force reflow
 
     newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
     oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
     newCanvas.style.opacity = 1;
-
-    // Trigger zoom to full size
-    // requestAnimationFrame(() => {
-    //     newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
-    //     oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
-    //     newCanvas.style.opacity = 1;
-    // });
-
-    // Trigger zoom to full size
-    // we need 2 requests to make it work on mozilla for some reason
-    // requestAnimationFrame(() => { 
-    // //     container.appendChild(newCanvas);
-    //     requestAnimationFrame(() => {
-    //         newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
-    //         oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
-    //         newCanvas.style.opacity = 1;
-    //     }); 
-    // });
 
     // After animation, replace .old with .new
     newCanvas.addEventListener('transitionend', () => {
@@ -121,22 +99,7 @@ container.onclick = e => {
 
 };
 
-function getPixelColor(canvas, x, y) {
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    const data = ctx.getImageData(x, y, 1, 1).data;
-    return data;
-}
 
-
-function loadImage(url) {
-    return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous"; // To avoid CORS issues
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = url;
-    });
-}
 
 async function main() {
     await fillImages();
@@ -156,53 +119,5 @@ async function main() {
     animationAvailable = true;
 }
 
-function circularVignetteFade(canvas, color) {
-    const UNTOUCHED_RADIUS_RATIO = 0.3;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    const { width, height } = canvas;
-    const imageData = ctx.getImageData(0, 0, width, height);
-    const data = imageData.data;
-
-    const [rFade, gFade, bFade] = color;
-
-    const cx = width / 2;
-    const cy = height / 2;
-
-    const maxDist = Math.sqrt(cx * cx + cy * cy);
-    const untouchedRadius = Math.min(width, height) * UNTOUCHED_RADIUS_RATIO;
-    const fadeStartRadius = Math.min(width, height) * 0.5;
-
-    for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-            const index = (y * width + x) * 4;
-
-            const dx = x - cx;
-            const dy = y - cy;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-
-            if (dist <= untouchedRadius) {
-                // Do nothing, keep original color
-                continue;
-            }
-
-            if (dist >= fadeStartRadius) {
-                // Fully outside: hard replace with fade color
-                data[index]     = rFade;
-                data[index + 1] = gFade;
-                data[index + 2] = bFade;
-                continue;
-            }
-
-            // In the gradient zone: blend
-            const factor = (dist - untouchedRadius) / (fadeStartRadius - untouchedRadius);
-
-            data[index]     = data[index] * (1 - factor) + rFade * factor;
-            data[index + 1] = data[index + 1] * (1 - factor) + gFade * factor;
-            data[index + 2] = data[index + 2] * (1 - factor) + bFade * factor;
-        }
-    }
-
-    ctx.putImageData(imageData, 0, 0);
-}
 
 main();
