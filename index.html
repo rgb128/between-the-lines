@@ -120,11 +120,19 @@
             container.appendChild(newCanvas);
 
             // Trigger zoom to full size
-            requestAnimationFrame(() => {
+            // requestAnimationFrame(() => {
+            //     newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
+            //     oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
+            //     newCanvas.style.opacity = 1;
+            // });
+
+            // Trigger zoom to full size
+            // we need 2 requests to make it work on mozilla for some reason
+            requestAnimationFrame(() => { requestAnimationFrame(() => {
                 newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
                 oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
                 newCanvas.style.opacity = 1;
-            });
+            }); });
 
             // After animation, replace .old with .new
             newCanvas.addEventListener('transitionend', () => {
