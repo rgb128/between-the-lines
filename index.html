@@ -32,24 +32,83 @@
             transition: transform var(--transition-bezier), opacity var(--transition-bezier);
             /* transition: transform 3s ease-out; */
         }
+
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            color: black;
+            font-family: sans-serif;
+            font-size: 1.5rem;
+            z-index: 1000;
+        }
+
+        /* Dark theme support */
+        @media (prefers-color-scheme: dark) {
+            #loader {
+                background-color: #121212;
+                color: #e0e0e0;
+            }
+        }
+
+        /* Dots animation */
+        #loader > div::after {
+            content: "";
+            display: inline-block;
+            animation: dots 2s steps(11, end) infinite;
+        }
+
+        @keyframes dots {
+            0%   { content: ""; }
+            10%  { content: "."; }
+            20%  { content: ".."; }
+            30%  { content: "..."; }
+            40%  { content: "...."; }
+            50%  { content: "....."; }
+            60%  { content: "......"; }
+            70%  { content: "......."; }
+            80%  { content: "........"; }
+            90%  { content: "........."; }
+            100% { content: ".........."; }
+        }
     </style>
 </head>
 <body>
     <div id="container"></div>
 
+    <div id="loader">
+        <div>
+            loading
+        </div>
+    </div>
+
     <script>
 
         // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
         const SIZE = 1000;
+        const IMAGES_QUEUE_SIZE = 5;
+        const FIRST_IMAGE_URL = '/first.png';
         const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
 
         const images = [];
         async function fillImages() {
-            const img = await loadImage(generateImageUrl());
+            const img = await loadImage(FIRST_IMAGE_URL);
             images.push(img);
-            for (let i = 0; i < 4; i++) {
-                loadImage(generateImageUrl()).then(img => images.push(img));
+
+            const tasks = [];
+            for (let i = 0; i < IMAGES_QUEUE_SIZE - 1; i++) {
+                const url = generateImageUrl();
+                const task = loadImage(url);
+                tasks.push(task);
             }
+            const results = await Promise.all(tasks);
+            images.push(...results);
         }
 
         const container = document.getElementById('container');
@@ -154,7 +213,6 @@
         function getPixelColor(canvas, x, y) {
             const ctx = canvas.getContext('2d', { willReadFrequently: true });
             const data = ctx.getImageData(x, y, 1, 1).data;
-            // return `rgb(${data[0]}, ${data[1]}, ${data[2]})`;
             return data;
         }
 
@@ -169,8 +227,9 @@
             });
         }
 
-        async function processImage() {
+        async function main() {
             await fillImages();
+            document.getElementById('loader').remove();
 
             const img = images.shift();
             loadImage(generateImageUrl()).then(img => images.push(img));
@@ -235,7 +294,7 @@
             ctx.putImageData(imageData, 0, 0);
         }
 
-        processImage();
+        main();
 
     </script>
 </body>
