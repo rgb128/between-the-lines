@@ -32,7 +32,6 @@ function circularVignetteFade(canvas, color) {
     const cx = width / 2;
     const cy = height / 2;
 
-    const maxDist = Math.sqrt(cx * cx + cy * cy);
     const untouchedRadius = Math.min(width, height) * UNTOUCHED_RADIUS_RATIO;
     const fadeStartRadius = Math.min(width, height) * 0.5;
 
@@ -58,7 +57,8 @@ function circularVignetteFade(canvas, color) {
             }
 
             // In the gradient zone: blend
-            const factor = (dist - untouchedRadius) / (fadeStartRadius - untouchedRadius);
+            const linearFactor = (dist - untouchedRadius) / (fadeStartRadius - untouchedRadius);
+            const factor = linearFactor * linearFactor; // Quadratic fade
 
             data[index]     = data[index] * (1 - factor) + rFade * factor;
             data[index + 1] = data[index + 1] * (1 - factor) + gFade * factor;
