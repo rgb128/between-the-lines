@@ -2,14 +2,14 @@
     --transition-bezier: 3s cubic-bezier(1, 0, .7, 0);
 }
 
-* {
+/* * {
     margin: 0px;
     padding: 0px;
 }
 
 body {
     position: relative;
-}
+} */
 
 #container {
     background-color: #808080;
