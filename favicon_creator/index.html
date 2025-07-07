@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quadratic Vignette Transparency</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2em;
+      background: #f0f0f0;
+    }
+    canvas {
+      border: 1px solid #ccc;
+      margin-top: 1em;
+    }
+    button {
+      margin-top: 1em;
+      padding: 0.5em 1em;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Apply Circular Vignette Transparency</h1>
+  <p>Loading image: <code>/favicon.png</code></p>
+  <canvas id="canvas"></canvas>
+  <br />
+  <button id="downloadBtn">Download Result</button>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+
+    const image = new Image();
+    image.src = '/favicon.png';
+    image.crossOrigin = 'anonymous';
+
+    image.onload = () => {
+      const size = Math.max(image.width, image.height);
+      canvas.width = canvas.height = size;
+      ctx.clearRect(0, 0, size, size);
+      ctx.drawImage(image, (size - image.width) / 2, (size - image.height) / 2);
+      applyVignette(canvas);
+    };
+
+    function applyVignette(canvas) {
+      const UNTOUCHED_RADIUS_RATIO = 0.2;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      const { width, height } = canvas;
+      const imageData = ctx.getImageData(0, 0, width, height);
+      const data = imageData.data;
+
+      const cx = width / 2;
+      const cy = height / 2;
+
+      const untouchedRadius = Math.min(width, height) * UNTOUCHED_RADIUS_RATIO;
+      const fadeStartRadius = Math.min(width, height) * 0.5;
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const index = (y * width + x) * 4;
+
+          const dx = x - cx;
+          const dy = y - cy;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist <= untouchedRadius) {
+            continue;
+          }
+
+          if (dist >= fadeStartRadius) {
+            // Fully outside: make fully transparent
+            data[index + 3] = 0;
+            continue;
+          }
+
+          // In gradient zone: fade alpha
+          const linearFactor = (dist - untouchedRadius) / (fadeStartRadius - untouchedRadius);
+          const factor = linearFactor * linearFactor; // Quadratic
+          data[index + 3] = data[index + 3] * (1 - factor);
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.download = 'vignette-transparent.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    });
+  </script>
+</body>
+</html>
