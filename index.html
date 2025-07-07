@@ -116,8 +116,12 @@
 
             // Place new canvas scaled to 1px size and positioned at clicked pixel
             newCanvas.style.transform = `translate(${round(clickX, 2)}px, ${round(clickY, 2)}px) scale(${round(1 / imageZoom, 2)})`;
-
             container.appendChild(newCanvas);
+            void newCanvas.offsetWidth; // Force reflow
+
+            newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
+            oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
+            newCanvas.style.opacity = 1;
 
             // Trigger zoom to full size
             // requestAnimationFrame(() => {
@@ -128,11 +132,14 @@
 
             // Trigger zoom to full size
             // we need 2 requests to make it work on mozilla for some reason
-            requestAnimationFrame(() => { requestAnimationFrame(() => {
-                newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
-                oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
-                newCanvas.style.opacity = 1;
-            }); });
+            // requestAnimationFrame(() => { 
+            // //     container.appendChild(newCanvas);
+            //     requestAnimationFrame(() => {
+            //         newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
+            //         oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
+            //         newCanvas.style.opacity = 1;
+            //     }); 
+            // });
 
             // After animation, replace .old with .new
             newCanvas.addEventListener('transitionend', () => {
