@@ -50,8 +50,17 @@ window.onresize();
 container.onclick = e => {
     if (!animationAvailable || !images.length) return;
     animationAvailable = false;
-    const clickX = e.offsetX;
-    const clickY = e.offsetY;
+    const rect = container.getBoundingClientRect();
+
+    // Get mouse position relative to the container, normalized by the transform scale
+    const scaleX = rect.width / WIDTH;
+    const scaleY = rect.height / HEIGHT;
+
+    const rawX = e.clientX - rect.left;
+    const rawY = e.clientY - rect.top;
+
+    const clickX = rawX / scaleX;
+    const clickY = rawY / scaleY;
 
     // Apply zoom
     const imageZoom = SIZE;
@@ -95,7 +104,7 @@ container.onclick = e => {
     oldCanvas.style.transformOrigin = `${clickX}px ${clickY}px`;
     oldCanvas.style.transform = `scale(${transformZoom})`;
     newCanvas.style.opacity = 1;
-    // void newCanvas.offsetWidth; // Force reflow
+    void newCanvas.offsetWidth; // Force reflow
 
     // After animation, replace .old with .new
     newCanvas.addEventListener('transitionend', () => {
