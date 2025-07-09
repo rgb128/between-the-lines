@@ -84,10 +84,18 @@ container.onclick = e => {
     newCanvas.style.transform = `translate(${round(clickX)}px, ${round(clickY)}px) scale(${round(1 / imageZoom)})`;
     container.appendChild(newCanvas);
     void newCanvas.offsetWidth; // Force reflow
-
+    
     newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
-    oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
+    // oldCanvas.style.left = translateX;
+    // oldCanvas.style.top = translateY;
+    // console.log(translateX, translateY);
+    // oldCanvas.style.transform = `scale(${transformZoom})`;
+    // oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
+    // oldCanvas.style.transform = `translate(${translateX}, ${translateY})`;
+    oldCanvas.style.transformOrigin = `${clickX}px ${clickY}px`;
+    oldCanvas.style.transform = `scale(${transformZoom})`;
     newCanvas.style.opacity = 1;
+    // void newCanvas.offsetWidth; // Force reflow
 
     // After animation, replace .old with .new
     newCanvas.addEventListener('transitionend', () => {

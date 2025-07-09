@@ -6,8 +6,8 @@
   <style>
     #container {
       position: relative;
-      width: 500px;
-      height: 500px;
+      width: 1000px;
+      height: 1000px;
       margin: 50px auto;
       background: #ccc;
     }
@@ -21,16 +21,23 @@
       transform: scale(1);
       transition: transform 3s linear;
     }
+
+    #wrapper {
+      transform: scale(.5);
+    }
   </style>
 </head>
 <body>
   <div id="container"></div>
+  <div id="wrapper">
+
+  </div>
 
   <script>
     const container = document.getElementById('container');
     const canvas = document.createElement('canvas');
-    canvas.width = 500;
-    canvas.height = 500;
+    canvas.width = 1000;
+    canvas.height = 1000;
     const ctx = canvas.getContext('2d');
 
     const img = new Image();
@@ -41,7 +48,7 @@
     let scaled = false;
     container.addEventListener('click', () => {
       scaled = !scaled;
-      canvas.style.transform = scaled ? 'scale(2)' : 'scale(1)';
+      canvas.style.transform = scaled ? 'scale(1000)' : 'scale(1)';
     });
   </script>
 </body>
