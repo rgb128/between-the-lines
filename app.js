@@ -3,8 +3,8 @@
 
 // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
 const SIZE = 1000;
-const IMAGES_QUEUE_SIZE = 5;
-const FIRST_IMAGE_URL = '/first.png';
+const IMAGES_QUEUE_SIZE = 3;
+const FIRST_IMAGE_URL = '/first.jpg';
 const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
 
 const images = [];
@@ -70,8 +70,8 @@ container.onclick = e => {
     const imagePositionY = clickY - clickY * imageZoom;
 
     const transformZoom = round(100 * imageZoom) + '%';
-    const translateX = round(imagePositionX) + 'px';
-    const translateY = round(imagePositionY) + 'px';
+    // const translateX = round(imagePositionX) + 'px';
+    // const translateY = round(imagePositionY) + 'px';
 
     const oldCanvas = container.querySelector('canvas.old');
     const pixelColor = getPixelColor(oldCanvas, clickX, clickY);
@@ -104,7 +104,7 @@ container.onclick = e => {
     oldCanvas.style.transformOrigin = `${clickX}px ${clickY}px`;
     oldCanvas.style.transform = `scale(${transformZoom})`;
     newCanvas.style.opacity = 1;
-    void newCanvas.offsetWidth; // Force reflow
+    // void newCanvas.offsetWidth; // Force reflow
 
     // After animation, replace .old with .new
     newCanvas.addEventListener('transitionend', () => {
