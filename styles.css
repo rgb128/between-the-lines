@@ -19,7 +19,7 @@ body {
     left: 0px; */
 }
 
-canvas {
+canvas, img {
     position: absolute;
     top: 0px;
     left: 0px;

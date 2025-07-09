@@ -2,8 +2,8 @@
 
 
 // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
-const SIZE = 1000;
-const IMAGES_QUEUE_SIZE = 5;
+const SIZE = 100;
+const IMAGES_QUEUE_SIZE = 2;
 const FIRST_IMAGE_URL = '/first.png';
 const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
 
@@ -64,36 +64,39 @@ container.onclick = e => {
     const translateX = round(imagePositionX) + 'px';
     const translateY = round(imagePositionY) + 'px';
 
-    const oldCanvas = container.querySelector('canvas.old');
-    const pixelColor = getPixelColor(oldCanvas, clickX, clickY);
+    const oldCanvas = container.querySelector('img.old');
+    // const pixelColor = getPixelColor(oldCanvas, clickX, clickY);
 
     // Create new canvas
-    const newCanvas = document.createElement('canvas');
-    newCanvas.width = WIDTH;
-    newCanvas.height = HEIGHT;
-    newCanvas.style.opacity = 0;
-    newCanvas.classList.add('new');
-    const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
+    // const newCanvas = document.createElement('canvas');
+    // newCanvas.width = WIDTH;
+    // newCanvas.height = HEIGHT;
+    // newCanvas.style.opacity = 0;
+    // newCanvas.classList.add('new');
+    // const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
 
     const img = images.shift();
+    img.style.width = WIDTH + 'px';
+    img.style.height = HEIGHT + 'px';
+    img.classList.add('old');
     loadImage(generateImageUrl()).then(img => images.push(img));
-    newCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
-    circularVignetteFade(newCanvas, pixelColor);
+    // newCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
+    // circularVignetteFade(newCanvas, pixelColor);
 
     // Place new canvas scaled to 1px size and positioned at clicked pixel
-    newCanvas.style.transform = `translate(${round(clickX)}px, ${round(clickY)}px) scale(${round(1 / imageZoom)})`;
-    container.appendChild(newCanvas);
-    void newCanvas.offsetWidth; // Force reflow
+    img.style.transform = `translate(${round(clickX)}px, ${round(clickY)}px) scale(${round(1 / imageZoom)})`;
+    container.appendChild(img);
+    void img.offsetWidth; // Force reflow
 
-    newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
+    img.style.transform = `translate(0px, 0px) scale(1)`;
     oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
-    newCanvas.style.opacity = 1;
+    img.style.opacity = 1;
 
     // After animation, replace .old with .new
-    newCanvas.addEventListener('transitionend', () => {
+    img.addEventListener('transitionend', () => {
         oldCanvas.remove();
-        newCanvas.classList.remove('new');
-        newCanvas.classList.add('old');
+        img.classList.remove('new');
+        img.classList.add('old');
         animationAvailable = true;
     }, { once: true });
 
@@ -106,16 +109,20 @@ async function main() {
     document.getElementById('loader').remove();
 
     const img = images.shift();
+    img.style.width = WIDTH + 'px';
+    img.style.height = HEIGHT + 'px';
+    img.classList.add('old');
     loadImage(generateImageUrl()).then(img => images.push(img));
 
     // create old canvas
-    const originalCanvas = document.createElement('canvas');
-    originalCanvas.classList.add('old');
-    originalCanvas.width = WIDTH;
-    originalCanvas.height = HEIGHT;
-    const oCtx = originalCanvas.getContext('2d', { willReadFrequently: true });
-    oCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
-    container.appendChild(originalCanvas);
+    // const originalCanvas = document.createElement('canvas');
+    // originalCanvas.classList.add('old');
+    // originalCanvas.width = WIDTH;
+    // originalCanvas.height = HEIGHT;
+    // const oCtx = originalCanvas.getContext('2d', { willReadFrequently: true });
+    // oCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
+    // container.appendChild(originalCanvas);
+    container.appendChild(img);
     animationAvailable = true;
 }
 
