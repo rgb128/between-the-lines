@@ -4,7 +4,7 @@
 // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
 const SIZE = 1000;
 const IMAGES_QUEUE_SIZE = 3;
-const FIRST_IMAGE_URL = 'first.jpg';
+const FIRST_IMAGE_URL = '/between-the-lines/first.jpg';
 const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
 
 const images = [];
