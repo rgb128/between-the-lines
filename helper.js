@@ -10,6 +10,14 @@ function getPixelColor(canvas, x, y) {
     return data;
 }
 
+async function loadImageAnyway(url) {
+    try {
+        return await loadImage(url);
+    } catch (ex) {
+        console.warn('Error loading image', url, ex);
+        return await loadImageAnyway(url);
+    }
+}
 function loadImage(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();

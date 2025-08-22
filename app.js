@@ -11,13 +11,13 @@ const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.rand
 
 const images = [];
 async function fillImages() {
-    const img = await loadImage(FIRST_IMAGE_URL);
+    const img = await loadImageAnyway(FIRST_IMAGE_URL);
     images.push(img);
 
     const tasks = [];
     for (let i = 0; i < IMAGES_QUEUE_SIZE - 1; i++) {
         const url = generateImageUrl();
-        const task = loadImage(url);
+        const task = loadImageAnyway(url);
         tasks.push(task);
     }
     const results = await Promise.all(tasks);
@@ -81,7 +81,7 @@ container.onclick = e => {
     const newCtx = newCanvas.getContext('2d', { willReadFrequently: true });
 
     const img = images.shift();
-    loadImage(generateImageUrl()).then(img => images.push(img));
+    loadImageAnyway(generateImageUrl()).then(img => images.push(img));
     newCtx.drawImage(img, 0, 0, WIDTH, HEIGHT);
     circularVignetteFade(newCanvas, pixelColor);
 
@@ -114,7 +114,7 @@ async function main() {
     document.getElementById('loader').remove();
 
     const img = images.shift();
-    loadImage(generateImageUrl()).then(img => images.push(img));
+    loadImageAnyway(generateImageUrl()).then(img => images.push(img));
 
     // create old canvas
     const originalCanvas = document.createElement('canvas');
