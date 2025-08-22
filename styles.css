@@ -10,6 +10,8 @@
 
 body {
     position: relative;
+    background-color: white;
+    transition: background-color var(--transition-bezier);
 }
 
 #container {
@@ -54,6 +56,9 @@ canvas {
     #loader {
         background-color: #121212;
         color: #e0e0e0;
+    }
+    body {
+        background-color: #121212;
     }
 }
 

@@ -4,7 +4,9 @@
 // const generateImageUrl = () => `https://random.imagecdn.app/${WIDTH}/${HEIGHT}?random=${Math.random()}`;
 const SIZE = 1000;
 const IMAGES_QUEUE_SIZE = 3;
-const FIRST_IMAGE_URL = '/between-the-lines/first.jpg';
+// const FIRST_IMAGE_URL = '/first.jpg';
+// const FIRST_IMAGE_URL = '/between-the-lines/first.jpg';
+const FIRST_IMAGE_URL = 'https://rgb128.github.io/between-the-lines/first.jpg';
 const generateImageUrl = () => `https://picsum.photos/${SIZE}?random=${Math.random()}`;
 
 const images = [];
@@ -65,13 +67,7 @@ container.onclick = e => {
     // Apply zoom
     const imageZoom = SIZE;
 
-    // New position should keep the image point under cursor stationary
-    const imagePositionX = clickX - clickX * imageZoom;
-    const imagePositionY = clickY - clickY * imageZoom;
-
     const transformZoom = round(100 * imageZoom) + '%';
-    // const translateX = round(imagePositionX) + 'px';
-    // const translateY = round(imagePositionY) + 'px';
 
     const oldCanvas = container.querySelector('canvas.old');
     const pixelColor = getPixelColor(oldCanvas, clickX, clickY);
@@ -92,15 +88,10 @@ container.onclick = e => {
     // Place new canvas scaled to 1px size and positioned at clicked pixel
     newCanvas.style.transform = `translate(${round(clickX)}px, ${round(clickY)}px) scale(${round(1 / imageZoom)})`;
     container.appendChild(newCanvas);
+    document.body.style.backgroundColor = `rgb(${pixelColor[0]}, ${pixelColor[1]}, ${pixelColor[2]})`;
     void newCanvas.offsetWidth; // Force reflow
     
     newCanvas.style.transform = `translate(0px, 0px) scale(1)`;
-    // oldCanvas.style.left = translateX;
-    // oldCanvas.style.top = translateY;
-    // console.log(translateX, translateY);
-    // oldCanvas.style.transform = `scale(${transformZoom})`;
-    // oldCanvas.style.transform = `translate(${translateX}, ${translateY}) scale(${transformZoom})`;
-    // oldCanvas.style.transform = `translate(${translateX}, ${translateY})`;
     oldCanvas.style.transformOrigin = `${clickX}px ${clickY}px`;
     oldCanvas.style.transform = `scale(${transformZoom})`;
     newCanvas.style.opacity = 1;
